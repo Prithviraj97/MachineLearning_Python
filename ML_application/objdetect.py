@@ -1,0 +1,1 @@
+#install required libraries to make simple object detector
