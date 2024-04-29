@@ -49,10 +49,10 @@ function captureFrame() {
     fetch('/detect', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json',  
         },
         body: JSON.stringify({ imageData: imageData }),
-    })
+    }) 
     .then(response => response.json())
     .then(results => {
         displayDetectionResults(results);
