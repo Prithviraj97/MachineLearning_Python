@@ -2,6 +2,9 @@ import tensorflow as tf
 from tensorflow.keras.layers import Input, Conv2D, TimeDistributed, Dense, Flatten, Dropout
 from tensorflow.keras.models import Model
 from tensorflow.keras.applications import VGG16
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
+
 
 def rpn_layer(base_layers, num_anchors):
     """Create a convolution layer to predict object scores and bounding boxes."""
@@ -53,3 +56,53 @@ def get_faster_rcnn_model():
     model_classifier.compile(optimizer='adam', loss=['categorical_crossentropy', 'mean_squared_error'], metrics=['accuracy'])
 
     return model_rpn, model_classifier
+
+
+def fit_and_evaluate(t_x, val_x, t_y, val_y, t_box, val_box, EPOCHS, BATCH_SIZE, class_w):
+    # Assuming `get_faster_rcnn_model()` is a function that builds and compiles the Faster R-CNN model
+    model_rpn, model_classifier = get_faster_rcnn_model()
+    
+    # Callbacks for training
+    erlstp = EarlyStopping(monitor='val_loss', patience=10, verbose=1)
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, verbose=1)
+    model_checkpoint = ModelCheckpoint('faster_rcnn_model.h5', monitor='val_loss', save_best_only=True, verbose=1)
+
+    # Training the RPN
+    print("Training RPN...")
+    model_rpn.fit(t_x, [t_y, t_box], batch_size=BATCH_SIZE, epochs=EPOCHS,
+                  validation_data=(val_x, [val_y, val_box]), 
+                  class_weight=class_w, callbacks=[erlstp, reduce_lr, model_checkpoint], verbose=1)
+
+    # Training the Classifier
+    print("Training Classifier...")
+    model_classifier.fit(t_x, [t_y, t_box], batch_size=BATCH_SIZE, epochs=EPOCHS,
+                         validation_data=(val_x, [val_y, val_box]), 
+                         class_weight=class_w, callbacks=[erlstp, reduce_lr, model_checkpoint], verbose=1)
+
+    # Evaluate the model
+    print("\nValidation Score: ", model_classifier.evaluate(val_x, [val_y, val_box]))
+    return model_rpn.history, model_classifier.history
+
+from sklearn.model_selection import train_test_split
+from sklearn.utils import shuffle
+
+n_folds = 5
+epochs = 100
+batch_size = 32
+weight = {'class_weight': 1}  # Define as needed based on your class imbalances
+
+model_history = []
+
+for i in range(n_folds):
+    print("Training on Fold: ", i + 1)
+
+    # Assuming your data and labels are split into features (X), labels for classification (Y), and bounding boxes (B)
+    X_train, X_val, Y_train, Y_val, B_train, B_val = train_test_split(
+        X, Y, B, test_size=0.2, random_state=i)  # Ensure you have a proper split for X, Y, and B
+
+    X_train, Y_train, B_train = shuffle(X_train, Y_train, B_train, random_state=i)
+
+    history_rpn, history_classifier = fit_and_evaluate(X_train, X_val, Y_train, Y_val, B_train, B_val, epochs, batch_size, weight)
+    model_history.append((history_rpn, history_classifier))
+    print("=======" * 12, end="\n\n")
+
