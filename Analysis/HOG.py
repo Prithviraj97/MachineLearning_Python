@@ -42,9 +42,9 @@ def detect_people_with_hog(video_path):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    # Release the video capture and close windows
-    cap.release()
-    cv2.destroyAllWindows()
+        # Release the video capture and close windows
+        cap.release()
+        cv2.destroyAllWindows()
 
     # Calculate and print statistics
     mean_detections = np.mean(detections_per_frame)
@@ -53,7 +53,7 @@ def detect_people_with_hog(video_path):
     print("Correct number of people detected (based on mean):", round(mean_detections))
 
 # Input path
-video_path = "C:/Users/joych/Downloads/nn.mp4"
+video_path = "C:\\Users\\TheEarthG\\Downloads\\human.mp4"
 
 # Run the detection
 detect_people_with_hog(video_path)

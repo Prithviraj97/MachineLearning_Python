@@ -70,9 +70,9 @@ def detect_objects(video_path, weights_path, config_path, class_names_path):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    # Release the video capture and close windows
-    cap.release()
-    cv2.destroyAllWindows()
+        # Release the video capture and close windows
+        cap.release()
+        cv2.destroyAllWindows()
 
     # Calculate and print the mean of human and non-human detections
     mean_human_detections = np.mean(human_detections_per_frame)
