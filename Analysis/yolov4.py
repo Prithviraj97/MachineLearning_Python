@@ -87,9 +87,9 @@ def detect_objects(video_path, weights_path, config_path, class_names_path):
     print("Correct number of humans detected (based on mean):", round(mean_human_detections))
     print("Correct number of non-human objects detected (based on mean):", round(mean_non_human_detections))
 
-video_path = "C:/Users/joych/Downloads/nn.mp4" 
-weights_path = "C:/Users/joych/Downloads/yolov4.weights" 
-config_path = "C:/Users/joych/Downloads/yolov4.cfg" 
-class_names_path = "C:/Users/joych/Downloads/coco.names"
+video_path = "C:\\Users\\TheEarthG\\Downloads\\human.mp4" 
+weights_path = "C:\\Users\\TheEarthG\\Downloads\\yolov4.weights" 
+config_path = "C:\\Users\\TheEarthG\\Downloads\\yolov4.cfg" 
+class_names_path = "C:\\Users\\TheEarthG\\Downloads\\coco.names"
 
 detect_objects(video_path, weights_path, config_path, class_names_path)
