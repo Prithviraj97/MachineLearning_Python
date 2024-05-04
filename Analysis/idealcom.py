@@ -14,18 +14,18 @@ def calculate_iou(gt_box, det_box):
       IoU of 0.5 is considered as threshold to classify detection as true positive.
   """
   # Calculate area of overlap and area of union
-  ymin_intersection = max(gt_box[0], det_box[0])
-  xmin_intersection = max(gt_box[1], det_box[1])
-  ymax_intersection = min(gt_box[2], det_box[2])
-  xmax_intersection = min(gt_box[3], det_box[3])
+  ymin_intersection = np.maximum(gt_box[:,0], det_box[0])
+  xmin_intersection = np.maximum(gt_box[:,1], det_box[1])
+  ymax_intersection = np.minimum(gt_box[:,2], det_box[2])
+  xmax_intersection = np.minimum(gt_box[:,3], det_box[3])
 
-  area_intersection = max(0, xmax_intersection - xmin_intersection) * max(0, ymax_intersection - ymin_intersection)
-  area_gt = (gt_box[2] - gt_box[0]) * (gt_box[3] - gt_box[1])
+  area_intersection = np.maximum(0, xmax_intersection - xmin_intersection) * np.maximum(0, ymax_intersection - ymin_intersection)
+  area_gt = (gt_box[:,2] - gt_box[:,0]) * (gt_box[:,3] - gt_box[:,1])
   area_det = (det_box[2] - det_box[0]) * (det_box[3] - det_box[1])
   area_union = area_gt + area_det - area_intersection
 
   # Calculate IoU
-  iou = area_intersection / area_union if area_union != 0 else 0 # Add a small value to avoid division by zero
+  iou = area_intersection / area_union  
   return iou
 
 def evaluate_model(gt_bbox, pred_bbox, iou_threshold=0.5):
@@ -50,7 +50,7 @@ def evaluate_model(gt_bbox, pred_bbox, iou_threshold=0.5):
   if len(gt_bbox) == 0 or len(pred_bbox) == 0:
         return 0, 0, 0
   
-  gt_boxes = np.array(gt_bbox)
+  gt_bbox = np.array(gt_bbox)
   pred_boxes = np.array(pred_bbox)
 
   true_positives = 0
@@ -58,13 +58,13 @@ def evaluate_model(gt_bbox, pred_bbox, iou_threshold=0.5):
   false_negatives = 0
 
   for pred_box in pred_boxes:
-    iou = calculate_iou(gt_boxes, pred_box)
+    iou = calculate_iou(gt_bbox, pred_box)
     if np.max(iou) >= iou_threshold:
         true_positives += 1
     else:
         false_positives += 1
 
-  false_negatives = len(gt_boxes) - true_positives
+  false_negatives = len(gt_bbox) - true_positives
 
   precision = true_positives / (true_positives + false_positives)
   recall = true_positives / (true_positives + false_negatives)
@@ -78,17 +78,17 @@ def evaluate_model(gt_bbox, pred_bbox, iou_threshold=0.5):
 
 def calculation_accuracy(detection_per_frame, ground_truth_per_frame):
    """
-   param: detection_per_frame - list of integers representing number of detections per frame.
-   param: ground_truth_per_frame - list of integers
+   param: detection_per_frame - list of integers representing number of human detections per frame.
+   param: ground_truth_per_frame - list of integers representing number of actual humans in the frame.
    """
    if len(detection_per_frame) != len(ground_truth_per_frame):
       raise ValueError("Different number of detections and ground truths")
    
    correct_detections = sum(1 for detected, actual in zip(detection_per_frame, ground_truth_per_frame) if detected == actual)
    accuracy = correct_detections / len(ground_truth_per_frame) 
-   return accuracy
+   return f'{accuracy*100:.2f}%'
 
-def print_evaluation_table(detection_methods, results):
+def print_evaluation_table(detection_methods, results, results2):
     """
     Print a table with precision, recall, and F1 scores for multiple detection methods.
 
@@ -98,7 +98,31 @@ def print_evaluation_table(detection_methods, results):
     """
     df = pd.DataFrame(results, index=['Precision', 'Recall', 'F1 Score'])
     df.columns.name = 'Detection Method'
+    accuracy_df = pd.DataFrame(results2, index=['Human Detection Accuracy'])
+    df = pd.concat([df, accuracy_df])
     print(df)
+
+#Example usage. It supposes that you have list of bounding boxes coordinates both predicted and ground truth one.
+gt_boxes = [[100, 100, 200, 200], [300, 300, 400, 400]]
+pred_boxes_method1 = [[90, 90, 210, 210], [320, 320, 420, 420], [500, 500, 600, 600]]
+pred_boxes_method2 = [[100, 100, 200, 200], [310, 310, 410, 410], [520, 520, 620, 620]]
+iou_threshold = 0.5
+
+# Example usage (assuming you have these lists from your video processing)
+yolo_detections = [3, 2, 4, 3, 5]  # Example detection counts per frame from YOLO
+hog_detections = [2, 2, 4, 3, 5]   # Example detection counts per frame from HOG
+ground_truth = [3, 2, 4, 3, 5]     # Actual counts of humans per frame
+
+results = {}
+results['YOLOv4'] = evaluate_model(gt_boxes, pred_boxes_method1, iou_threshold)
+results['HOG'] = evaluate_model(gt_boxes, pred_boxes_method2, iou_threshold)
+# print_evaluation_table(['YOLOv4', 'HOG'], results)
+
+results2={}
+results2['YOLOv4'] = calculation_accuracy(yolo_detections, ground_truth)
+results2['HOG'] = calculation_accuracy(hog_detections, ground_truth)
+print_evaluation_table(['YOLOv4', 'HOG'], results, results2)
+
 
 
 
