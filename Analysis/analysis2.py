@@ -1,30 +1,31 @@
-# def calculate_model_accuracy(detections_per_frame, ground_truth_per_frame):
-#     """
-#     Calculate model accuracy based on frame-by-frame comparison with ground truth.
+def calculate_model_accuracy(detections_per_frame, ground_truth_per_frame):
+    """
+    Calculate model accuracy based on frame-by-frame comparison with ground truth.
 
-#     :param detections_per_frame: List of integers, number of detections per frame by the model.
-#     :param ground_truth_per_frame: List of integers, actual number of objects per frame.
-#     :return: Accuracy as a float.
-#     """
-#     if len(detections_per_frame) != len(ground_truth_per_frame):
-#         print("Error: Mismatch in number of frames between detections and ground truth.")
-#         return
+    :param detections_per_frame: List of integers, number of detections per frame by the model.
+    :param ground_truth_per_frame: List of integers, actual number of objects per frame.
+    :return: Accuracy as a float.
+    """
+    if len(detections_per_frame) != len(ground_truth_per_frame):
+        print("Error: Mismatch in number of frames between detections and ground truth.")
+        return
     
-#     # Calculate accuracy per frame
-#     correct_detections = sum(1 for detected, actual in zip(detections_per_frame, ground_truth_per_frame) if detected == actual)
-#     accuracy = correct_detections / len(ground_truth_per_frame)
+    # Calculate accuracy per frame
+    correct_detections = sum(1 for detected, actual in zip(detections_per_frame, ground_truth_per_frame) if detected == actual)
+    accuracy = correct_detections / len(ground_truth_per_frame)
     
-#     print(f"Model Accuracy: {accuracy*100:.2f}%")
-#     return accuracy
+    # print(f"Model Accuracy: {accuracy*100:.2f}%")
+    return accuracy
 
-# # Example usage (assuming you have these lists from your video processing)
-# yolo_detections = [3, 2, 4, 3, 5]  # Example detection counts per frame from YOLO
-# hog_detections = [2, 2, 4, 3, 5]   # Example detection counts per frame from HOG
-# ground_truth = [3, 2, 4, 3, 5]     # Actual counts of humans per frame
+# Example usage (assuming you have these lists from your video processing)
+yolo_detections = [3, 2, 4, 3, 5]  # Example detection counts per frame from YOLO
+hog_detections = [2, 2, 4, 3, 5]   # Example detection counts per frame from HOG
+ground_truth = [3, 2, 4, 3, 5]     # Actual counts of humans per frame
 
-# # Calculate and print the accuracy for both models
-# yolo_accuracy = calculate_model_accuracy(yolo_detections, ground_truth)
-# hog_accuracy = calculate_model_accuracy(hog_detections, ground_truth)
+# Calculate and print the accuracy for both models
+yolo_accuracy = calculate_model_accuracy(yolo_detections, ground_truth)
+hog_accuracy = calculate_model_accuracy(hog_detections, ground_truth)
+
 import yolov4, HOG
 import cv2
 import numpy as np

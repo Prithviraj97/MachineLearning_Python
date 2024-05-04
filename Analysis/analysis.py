@@ -39,7 +39,8 @@ def evaluate_detections(ground_truths, detected_boxes, iou_threshold=0.5):
 
     # False positives are detections without a matching ground truth
     false_positives = len(detected_boxes) - true_positives
-
+    print(true_positives, "True positives")
+    print(false_positives, "False positives")
     # Calculate precision, recall, and F1-score
     precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0
     recall = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0
@@ -50,19 +51,19 @@ def evaluate_detections(ground_truths, detected_boxes, iou_threshold=0.5):
 # Define ground truth bounding boxes
 # Format: [x, y, width, height]
 ground_truths = [
-    [10, 20, 30, 40],  # Example ground truth box
+    [10, 20, 30, 40], [20, 42, 38, 50], # Example ground truth box
     # Add more ground truth boxes as needed
 ]
 
 # Define detected bounding boxes for YOLOv4
 detected_boxes_yolov4 = [
-    [10, 18, 26, 42],  # Example detected box
+    [10, 18, 26, 42],[15, 36, 30, 46],  # Example detected box
     # Add more detected boxes as needed
 ]
 
 # Define detected bounding boxes for HOG
 detected_boxes_hog = [
-    [15, 25, 30, 40],  # Example detected box
+    [15, 25, 30, 40],[16, 38, 32, 42],  # Example detected box
     # Add more detected boxes as needed
 ]
 
