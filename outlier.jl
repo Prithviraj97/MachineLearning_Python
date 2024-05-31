@@ -3,7 +3,7 @@ using Combinatorics, LinearAlgebra, CSV, DataFrames, Serialization, IterTools, D
 using PyCall
 
 scipy_integrate = pyimport("scipy.integrate")
-ThreadTools.nthreads() = 4
+# ThreadTools.nthreads() = 4
 println("Number of threads:", ThreadTools.nthreads())
 
 # Constants
