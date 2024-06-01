@@ -1,10 +1,10 @@
 using Statistics, Distributions, Combinatorics, Random, SpecialFunctions
-using Combinatorics, LinearAlgebra, CSV, DataFrames, Serialization, IterTools, Distributed, ThreadTools
+using Combinatorics, LinearAlgebra, CSV, DataFrames, Serialization, IterTools, Distributed, .Threads
 using PyCall
 
 scipy_integrate = pyimport("scipy.integrate")
 # ThreadTools.nthreads() = 4
-println("Number of threads:", ThreadTools.nthreads())
+println("Number of threads:", Threads.nthreads())
 
 # Constants
 mu_00 = mu_11 = 1 # optimal payoff distribution
@@ -38,6 +38,15 @@ function h_01(K, i)
     integrate_function(f)
 end
 
+# Signal ratio function
+function signal_ratio(s, rho_hat)
+    return ifelse(s == 1, rho_hat / (1 - rho_hat), (1 - rho_hat) / rho_hat)
+end
+
+# Decision-making rule
+function choice_1(signal_ratio, N, B)
+    return ifelse(B == 0, 0, ifelse(signal_ratio > N / B, 1, 0))
+end
 # Define functions N and B
 function N(i, q_hat, gamma_hat, phi_hat, A, J, K, mean_00, mean_10)
     n1 = phi_hat * (1 - gamma_hat) * (1 - q_hat)^i * q_hat^(K - i)

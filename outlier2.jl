@@ -1,10 +1,10 @@
 using Statistics, Distributions, Combinatorics, Random, SpecialFunctions
 using PyCall
-using LinearAlgebra, DataFrames, Serialization, IterTools, ThreadTools
+using LinearAlgebra, DataFrames, Serialization, IterTools, .Threads
 
-ThreadTools.nthreads() = 1
+Threads.nthreads() = 1
 # Ensure correct number of threads
-println("Number of threads: ", ThreadTools.nthreads())
+println("Number of threads: ", Threads.nthreads())
 
 # Define distributions using parameters
 mu_00 = mu_11 = 1

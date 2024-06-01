@@ -5,7 +5,7 @@ scipy_integrate = pyimport("scipy.integrate")
 #Pkg.add("PyCall")
 #Conda.add("scipy")
 
-Threads.nthreads()=4
+Threads.nthreads()=1
 println("Number of threads:", Threads.nthreads())
 
 mu_00=mu_11=1 #optimal payoff distribution
@@ -176,12 +176,6 @@ function choice_1(signal_ratio, N, B)
     end
 end
 #choice_1.(signal_ratio, N, B) = ifelse.(B .== 0, 0, ifelse.(signal_ratio .> N ./ B, 1, 0))
-
-
-
-
-
-
 
 function main_computation()
     K = 3
