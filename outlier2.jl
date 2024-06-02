@@ -2,8 +2,7 @@ using Statistics, Distributions, Combinatorics, Random, SpecialFunctions
 using PyCall
 using LinearAlgebra, DataFrames, Serialization, IterTools, .Threads
 
-Threads.nthreads() = 1
-# Ensure correct number of threads
+Threads.nthreads() = 4
 println("Number of threads: ", Threads.nthreads())
 
 # Define distributions using parameters

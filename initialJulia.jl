@@ -146,7 +146,7 @@ end
 function h_00(K, i)
     f = (x, v) -> f_X_opt(K, i, x) * g_V_sub(K, i, v)
     result, _ = scipy_integrate.dblquad(f, -Inf, Inf, (v) -> -Inf, (v) -> v)
-    return 1 - result
+    return 1 - result  
 end
 
 function h_01(K, i)
