@@ -1,32 +1,75 @@
 import numpy as np
 import pandas as pd
 
+# def calculate_iou(gt_box, det_box):
+#   """
+#   Calculates Intersection-over-Union (IoU) between two bounding boxes.
+
+#   Args:
+#       gt_box: Ground truth bounding box (list of [y_min, x_min, y_max, x_max] coordinates).
+#       det_box: Detected bounding box (list of [y_min, x_min, y_max, x_max] coordinates).
+
+#   Returns:
+#       IoU value (float) between 0 and 1. 
+#       IoU of 0.5 is considered as threshold to classify detection as true positive.
+#   """
+#   # Calculate area of overlap and area of union
+#   ymin_intersection = np.maximum(gt_box[:,0], det_box[0])
+#   xmin_intersection = np.maximum(gt_box[:,1], det_box[1])
+#   ymax_intersection = np.minimum(gt_box[:,2], det_box[2])
+#   xmax_intersection = np.minimum(gt_box[:,3], det_box[3])
+
+#   area_intersection = np.maximum(0, xmax_intersection - xmin_intersection) * np.maximum(0, ymax_intersection - ymin_intersection)
+#   area_gt = (gt_box[:,2] - gt_box[:,0]) * (gt_box[:,3] - gt_box[:,1])
+#   area_det = (det_box[2] - det_box[0]) * (det_box[3] - det_box[1])
+#   area_union = area_gt + area_det - area_intersection
+
+#   # Calculate IoU
+#   iou = area_intersection / area_union  
+#   return iou
+
+import numpy as np
+
 def calculate_iou(gt_box, det_box):
-  """
-  Calculates Intersection-over-Union (IoU) between two bounding boxes.
+    """
+    Calculate the intersection-over-union (IoU) value between the detected and ground truth bounding boxes.
 
-  Args:
-      gt_box: Ground truth bounding box (list of [y_min, x_min, y_max, x_max] coordinates).
-      det_box: Detected bounding box (list of [y_min, x_min, y_max, x_max] coordinates).
+    Args:
+        gt_box (numpy array): A 2D array of shape (n, 4) containing the ground truth bounding box values in the form of [y_min, x_min, y_max, x_max].
+        det_box (list or numpy array): A list or array of length 4 containing the predicted bounding box values in the form of [y_min, x_min, y_max, x_max].
 
-  Returns:
-      IoU value (float) between 0 and 1. 
-      IoU of 0.5 is considered as threshold to classify detection as true positive.
-  """
-  # Calculate area of overlap and area of union
-  ymin_intersection = np.maximum(gt_box[:,0], det_box[0])
-  xmin_intersection = np.maximum(gt_box[:,1], det_box[1])
-  ymax_intersection = np.minimum(gt_box[:,2], det_box[2])
-  xmax_intersection = np.minimum(gt_box[:,3], det_box[3])
+    Returns:
+        iou (numpy array): A 1D array of shape (n,) containing the IoU values between the detected and ground truth bounding boxes.
 
-  area_intersection = np.maximum(0, xmax_intersection - xmin_intersection) * np.maximum(0, ymax_intersection - ymin_intersection)
-  area_gt = (gt_box[:,2] - gt_box[:,0]) * (gt_box[:,3] - gt_box[:,1])
-  area_det = (det_box[2] - det_box[0]) * (det_box[3] - det_box[1])
-  area_union = area_gt + area_det - area_intersection
+    Note:
+        This function assumes that the input bounding box values are valid (i.e., y_min <= y_max and x_min <= x_max).
+    """
 
-  # Calculate IoU
-  iou = area_intersection / area_union  
-  return iou
+    # Ensure det_box is a numpy array for vectorized operations
+    det_box = np.array(det_box)
+
+    # Calculate the intersection coordinates
+    ymin_intersection = np.maximum(gt_box[:, 0], det_box[0])  # Maximum of y_min values
+    xmin_intersection = np.maximum(gt_box[:, 1], det_box[1])  # Maximum of x_min values
+    ymax_intersection = np.minimum(gt_box[:, 2], det_box[2])  # Minimum of y_max values
+    xmax_intersection = np.minimum(gt_box[:, 3], det_box[3])  # Minimum of x_max values
+
+    # Calculate the intersection area
+    area_intersection = np.maximum(0, xmax_intersection - xmin_intersection) * np.maximum(0, ymax_intersection - ymin_intersection)
+
+    # Calculate the areas of the ground truth and detected bounding boxes
+    area_gt = (gt_box[:, 2] - gt_box[:, 0]) * (gt_box[:, 3] - gt_box[:, 1])
+    area_det = (det_box[2] - det_box[0]) * (det_box[3] - det_box[1])
+
+    # Calculate the union area
+    area_union = area_gt + area_det - area_intersection
+
+    # Check if the union area is positive to avoid division by zero
+    mask = area_union > 0
+    iou = np.zeros_like(area_union)
+    iou[mask] = area_intersection[mask] / area_union[mask]
+
+    return iou
 
 def evaluate_model(gt_bbox, pred_bbox, iou_threshold=0.5):
   
