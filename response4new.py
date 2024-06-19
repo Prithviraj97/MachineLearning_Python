@@ -13,10 +13,11 @@ class sift:
         """
         print(img.shape)
         h, w, c = img.shape
-        if c > 1:
-            img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        else:
-            img_gray = img
+        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # if c > 1:
+        #     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # else:
+        #     img_gray = img
 
         # Step 1: Create Gaussian Pyramids
         octaves = [img_gray]
