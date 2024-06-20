@@ -57,7 +57,7 @@ class sift():
         g = g / g.sum()
         return self.convolve(img, g)
 
-    def convolve(img, kernel):
+    def convolve(self,img, kernel):
         """Convolves an image with a given kernel."""
         kh, kw = kernel.shape
         h, w = img.shape
@@ -68,18 +68,18 @@ class sift():
                 output[i, j] = np.sum(img_padded[i:i+kh, j:j+kw] * kernel)
         return output
 
-    def difference_of_gaussians(img, sigma1, sigma2):
+    def difference_of_gaussians(self,img, sigma1, sigma2):
         """Computes the Difference of Gaussians for an image at two scales."""
-        return gaussian_blur(img, sigma1) - gaussian_blur(img, sigma2)
+        return self.gaussian_blur(img, sigma1) - self.gaussian_blur(img, sigma2)
 
-    def detect_keypoints(img):
+    def detect_keypoints(self,img):
         """Detects keypoints in an image using a basic thresholding approach."""
         sigma1, sigma2 = 1, 2
-        dog = difference_of_gaussians(img, sigma1, sigma2)
+        dog = self.difference_of_gaussians(img, sigma1, sigma2)
         keypoints = np.argwhere(dog > np.percentile(dog, 95))  # Detect strong responses
         return keypoints
 
-    def out(self, img):
+    def out(img):
         if img.ndim == 3 and img.shape[2] == 3:  # Assuming BGR color image
             img_gray = np.mean(img, axis=2)  # Convert to grayscale
         else:
@@ -96,4 +96,4 @@ from PIL import Image
 #Open the image with PIL to ensure the image is loaded correctly
 image = Image.open('11102.jpg') 
 # img = np.asarray(image)       #convert JpegImageFile into numpy array
-print(out(img=image))
+print(sift.out(img=image))
