@@ -85,6 +85,35 @@ def is_extremum(image, i, j, threshold):
     return False
 
 
+# def compute_descriptor(image, keypoints, num_bins=8):
+#     """
+#     Compute descriptors for the given keypoints.
+
+#     Args:
+#     image (numpy array): Input image.
+#     keypoints (list): List of keypoints detected in the image.
+#     num_bins (int): Number of bins for the histogram.
+
+#     Returns:
+#     descriptors (list): List of descriptors for the keypoints.
+#     """
+#     descriptors = []
+#     for keypoint in keypoints:
+#         x, y, octave, interval = keypoint
+#         patch = get_patch(image, x, y, octave)
+#         histogram = np.zeros((num_bins, num_bins))
+#         for i in range(patch.shape[0]):
+#             for j in range(patch.shape[1]):
+#                 magnitude = np.sqrt(patch[i, j, 0]**2 + patch[i, j, 1]**2)
+#                 direction = np.arctan2(patch[i, j, 1], patch[i, j, 0])
+#                 bin_x = int(np.floor((direction + np.pi) / (2 * np.pi / num_bins)))  # Map direction to [0, num_bins)
+#                 bin_y = int(np.floor(magnitude / (255 / num_bins)))  # Map magnitude to [0, num_bins)
+#                 if 0 <= bin_x < num_bins and 0 <= bin_y < num_bins:  # Check if bin indices are within valid range
+#                     histogram[bin_x, bin_y] += 1
+#         descriptors.append(histogram.flatten())
+
+#     return descriptors
+
 def compute_descriptor(image, keypoints, num_bins=8):
     """
     Compute descriptors for the given keypoints.
@@ -106,8 +135,11 @@ def compute_descriptor(image, keypoints, num_bins=8):
             for j in range(patch.shape[1]):
                 magnitude = np.sqrt(patch[i, j, 0]**2 + patch[i, j, 1]**2)
                 direction = np.arctan2(patch[i, j, 1], patch[i, j, 0])
-                bin_x = int(np.floor(direction / (2 * np.pi / num_bins)))
+                bin_x = int(np.floor((direction + np.pi) / (2 * np.pi / num_bins)))
                 bin_y = int(np.floor(magnitude / (255 / num_bins)))
+                # Ensure bin indices are within valid range
+                bin_x = max(0, min(bin_x, num_bins - 1))
+                bin_y = max(0, min(bin_y, num_bins - 1))
                 histogram[bin_x, bin_y] += 1
         descriptors.append(histogram.flatten())
 
@@ -154,7 +186,7 @@ def sift_algorithm(image_path):
 
 
 def main():
-    image_dir = 'images'
+    image_dir = 'C:\\Users\\TheEarthG\\OneDrive\\Pictures\\images'
     keypoints_dict = {}
     for filename in os.listdir(image_dir):
         if filename.endswith(".jpg") or filename.endswith(".png"):
