@@ -11,7 +11,7 @@ X, y = datasets.make_circles(n_samples=300, factor=0.5, noise=0.1)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
 # Step 3: Train SVM with RBF kernel
-clf = SVC(kernel='linear', C=1.0, gamma='scale')
+clf = SVC(kernel='sigmoid', C=1.0, gamma='scale')
 clf.fit(X_train, y_train)
 
 # Step 4: Evaluate
@@ -30,7 +30,7 @@ def plot_decision_boundary(clf, X, y):
 
     plt.contourf(xx, yy, Z, cmap=plt.cm.coolwarm, alpha=0.8)
     plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.coolwarm, edgecolors='k')
-    plt.title("SVM with Linear Kernel")
+    plt.title("SVM with Sigmoid Kernel")
     plt.xlabel("Feature 1")
     plt.ylabel("Feature 2")
     plt.show()
